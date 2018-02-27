@@ -1,0 +1,44 @@
+{
+  "name": "restructor",
+  "version": "1.0.0",
+  "description": "Restructure your project files in a structured way",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel src -d . && babel scheme-es6 -d scheme",
+    "prepublish": "npm run build",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "test": "jest --no-cache"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theKashey/restructor.git"
+  },
+  "bin": {
+    "restructor": "./bin/restructor"
+  },
+  "keywords": [
+    "rename",
+    "restructure",
+    "camelcase",
+    "snakecase"
+  ],
+  "author": "Anton Korzunov <thekashey@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.1",
+    "babel-jest": "^22.4.1",
+    "babel-preset-env": "^1.6.1",
+    "chai": "^4.1.2",
+    "eslint": "^4.18.0",
+    "jest": "^22.4.2"
+  },
+  "bugs": {
+    "url": "https://github.com/theKashey/restructor/issues"
+  },
+  "homepage": "https://github.com/theKashey/restructor#readme",
+  "dependencies": {
+    "scan-directory": "^1.0.0"
+  }
+}
