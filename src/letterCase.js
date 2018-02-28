@@ -29,13 +29,13 @@ const snakeConversion = name => {
     .join('-')
     .split('-.')
     .join('.')
-    .toLowerCase();
 };
 
 const camelConversion = name => {
-  return tokenConversion(name)
+  const newName = tokenConversion(name)
     .map(makeFromCapital)
-    .join('')
+    .join('');
+  return name.charAt(0) + newName.substr(1);
 };
 
 export const startsFromCapital = file => {
@@ -47,6 +47,25 @@ export const startsFromLower = file => {
   const data = parse(file);
   return join(data.dir, makeFromLower(data.name) + data.ext);
 };
+
+export const loweCaseFileName = file => {
+  const data = parse(file);
+  return join(data.dir, data.name.toLowerCase() + data.ext);
+};
+
+export const upperCaseFileName = file => {
+  const data = parse(file);
+  return join(data.dir, data.name.toLowerCase() + data.ext);
+};
+
+export const keepIndex = file => {
+  const data = parse(file);
+  const lowerName = data.name.toLowerCase();
+  if (lowerName === 'index') {
+    return join(data.dir, lowerName + data.ext);
+  }
+  return file;
+}
 
 export const toSnakeCase = file => {
   const data = parse(file);

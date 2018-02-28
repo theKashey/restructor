@@ -1,15 +1,13 @@
 import scanDirectory from 'scan-directory';
-import {resolve,} from 'path';
-import {getFileContent} from "./lib/utils";
+import {resolve} from 'path';
+import {getFileContent, filePutContent} from "./lib/utils";
 
 const ItoI = i => i;
 
-export const rejectSystem = (file, stats) =>
+const rejectSystem = (file, stats) =>
   stats.isDirectory() && file.match(/node_modules/) || file.match(/(\/\.\w+)/)
 
-//acceptAll
-
-async function restructure(root, callback, filter = ItoI) {
+export async function restructure(root, filter = ItoI) {
   const files = filter(await scanDirectory(root, undefined, rejectSystem));
 
   const awaits = files
@@ -19,23 +17,29 @@ async function restructure(root, callback, filter = ItoI) {
       return {
         file,
         relativeFileName,
-        content,
-        actions: []
+        content
       };
     });
-
-  const mappedFiles = await Promise.all(awaits);
-
-  return mappedFiles
-    .map(line => Object.assign({}, line, {
-        rename: callback(line)
-      }
-    ))
-    .filter(({file, rename}) => rename && rename !== file);
+  return await Promise.all(awaits);
 }
 
+export const rename = (files, callback) => {
+  return files
+    .map(line => ({
+      ...line,
+      rename: callback(line)
+    }))
+};
 
-export {}
+export async function writeContent(files) {
+  await files
+    .map(file => {
+      if (file.newContent && file.newContent !== file.content) {
+        return filePutContent(file.file, file.newContent);
+      }
+      return Promise.resolve();
+    });
+  return files;
+}
 
-export default restructure;
 

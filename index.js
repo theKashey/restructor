@@ -3,12 +3,12 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.rejectSystem = undefined;
+exports.writeContent = exports.rename = exports.restructure = undefined;
 
-//acceptAll
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-let restructure = (() => {
-  var _ref = _asyncToGenerator(function* (root, callback, filter = ItoI) {
+let restructure = exports.restructure = (() => {
+  var _ref = _asyncToGenerator(function* (root, filter = ItoI) {
     const files = filter((yield (0, _scanDirectory2.default)(root, undefined, rejectSystem)));
 
     const awaits = files.map((() => {
@@ -18,29 +18,35 @@ let restructure = (() => {
         return {
           file,
           relativeFileName,
-          content,
-          actions: []
+          content
         };
       });
 
-      return function (_x3) {
+      return function (_x2) {
         return _ref2.apply(this, arguments);
       };
     })());
-
-    const mappedFiles = yield Promise.all(awaits);
-
-    return mappedFiles.map(function (line) {
-      return Object.assign({}, line, {
-        rename: callback(line)
-      });
-    }).filter(function ({ file, rename }) {
-      return rename && rename !== file;
-    });
+    return yield Promise.all(awaits);
   });
 
-  return function restructure(_x, _x2) {
+  return function restructure(_x) {
     return _ref.apply(this, arguments);
+  };
+})();
+
+let writeContent = exports.writeContent = (() => {
+  var _ref3 = _asyncToGenerator(function* (files) {
+    yield files.map(function (file) {
+      if (file.newContent && file.newContent !== file.content) {
+        return (0, _utils.filePutContent)(file.file, file.newContent);
+      }
+      return Promise.resolve();
+    });
+    return files;
+  });
+
+  return function writeContent(_x3) {
+    return _ref3.apply(this, arguments);
   };
 })();
 
@@ -58,4 +64,10 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 const ItoI = i => i;
 
-const rejectSystem = exports.rejectSystem = (file, stats) => stats.isDirectory() && file.match(/node_modules/) || file.match(/(\/\.\w+)/);exports.default = restructure;
+const rejectSystem = (file, stats) => stats.isDirectory() && file.match(/node_modules/) || file.match(/(\/\.\w+)/);
+
+const rename = exports.rename = (files, callback) => {
+  return files.map(line => _extends({}, line, {
+    rename: callback(line)
+  }));
+};
