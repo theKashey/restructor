@@ -45,7 +45,11 @@ let gitRenameAsync = exports.gitRenameAsync = (() => {
 
     for (let cmd of cmds) {
       console.log(cmd);
-      yield pExec(cmd);
+      try {
+        yield pExec(cmd);
+      } catch (e) {
+        console.error(e);
+      }
     }
   });
 

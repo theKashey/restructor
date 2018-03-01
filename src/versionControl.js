@@ -28,13 +28,17 @@ async function ensurePathExists(path, lookup) {
 }
 
 export async function gitRenameAsync(names) {
-  const renames = names.filter(({file, rename}) => !!rename && rename!==file);
+  const renames = names.filter(({file, rename}) => !!rename && rename !== file);
   const lookup = {};
   await Promise.all(renames.map(({rename}) => ensurePathExists(rename, lookup)));
   const cmds = renames.map(({file, rename}) => `git mv ${file} ${rename}`);
 
   for (let cmd of cmds) {
     console.log(cmd);
-    await pExec(cmd);
+    try {
+      await pExec(cmd);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
