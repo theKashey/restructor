@@ -15,7 +15,34 @@ And it this same time:
  - it will use `git mv` to __rename__ the file. Maintaining history.
  - it will __update all the usages__ from just renamed file.
  
-It will help you __RESTRUCTURE__ your codebase.
+It will help you __RESTRUCTURE__ your codebase, rewiring all imports, requires, and even proxyquire
+
+# Schemes
+There are 4 pre-created schemes
+ - `import toReactCamelCase from 'restructor/scheme/React-Camel-case' - to restructure to React+CamelCase
+ - `import toSnakeCase from 'restructor/scheme/snake-case' - to restructure to snake case
+ - `import rewireAlises from 'restructor/scheme/change-aliases' - to change aliases
+ - `import rename from 'restructor/scheme/rename' - just to rename anything
+
+All accepts __root__ as the first argument, and aliases as the second.
+```js
+const aliases =  {
+  common: path.resolve('src/common'),
+  components: path.resolve('src/components'),  
+};
+
+await toReactCamelCase(root, aliases)
+await toSnakeCase(root, aliases)
+await rewireAlises(root, oldAliases, newAliases)
+await rename(root, renameCallback, aliases)
+```
+
+All will return the set of changes, you have to apply
+```js
+const changes = await toSnakeCase(root, aliases);
+await writeContent(change);
+await gitRenameAsync(change);
+```
 
 # API 
 ```js
