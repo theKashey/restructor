@@ -1,6 +1,6 @@
 {
   "name": "restructor",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Restructure your project files in a structured way",
   "main": "index.js",
   "scripts": {
