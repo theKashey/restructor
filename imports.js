@@ -18,15 +18,17 @@ const getRelative = (from, to) => {
   return rel;
 };
 
-const getDynamicImports = str => (str.match(/import\((['"]?[\w-/.]+['"]?)\)/g) || []).map(statement => ({
+const getImportString = (pattern, selected) => str => (str.match(new RegExp(pattern, 'g')) || []).map(statement => ({
   statement,
-  importName: statement.match(/import\((['"]?[\w-/.]+['"]?)\)/i)[1]
+  importName: statement.match(new RegExp(pattern, 'i'))[selected],
+  rule: pattern
 }));
 
-const getStaticImports = str => (str.match(/import (.*) from (['"]?[\w-/.]+['"]?)/g) || []).map(statement => ({
-  statement,
-  importName: statement.match(/import (.*) from (['"]?[\w-/.]+['"]?)/i)[2]
-}));
+const getDynamicImports = getImportString(`import\\((['"]?[\\w-/.]+['"]?)\\)`, 1);
+const getStaticImports = getImportString(`import (.*) from (['"]?[\\w-/.]+['"]?)`, 2);
+const getRequires = getImportString(`require\\(([\\'"]?[\\w-/.]+[\\'"]?)\\)`, 1);
+const getCSSImports = getImportString(`@import (['"]?[\\w-/.]+['"]?)`, 1);
+const getProxyquire = getImportString(`proxyquire([\\w.\\(\\)]+)load\\((.*),`, 2);
 
 const applyAlias = (alias, path, string) => {
   return string.split(path).join(alias);
@@ -46,7 +48,7 @@ const resolver = (aliases, origin, file) => {
     return (0, _path.normalize)((0, _path.resolve)(origin, file));
   }
   if (file[0] === '~') {
-    return (0, _path.normalize)((0, _path.resolve)(aliases['/'], file));
+    return (0, _path.normalize)((0, _path.resolve)(aliases.values['/'], file.substr(1)));
   }
   const aliasKey = searchForString(file, aliases.keys);
   if (aliasKey !== false) {
@@ -67,17 +69,17 @@ const renameImport = (importLine, renames) => _extends({}, importLine, {
   resolvedName: renames[importLine.resolvedName] || importLine.resolvedName
 });
 
-const getImports = exports.getImports = content => [...getStaticImports(content), ...getDynamicImports(content)];
+const getImports = exports.getImports = (content, additional = () => []) => [...getStaticImports(content), ...getDynamicImports(content), ...getRequires(content), ...getProxyquire(content), ...getCSSImports(content), ...additional(content)];
 
-const resolveFileImports = exports.resolveFileImports = (file, aliases) => {
+const resolveFileImports = exports.resolveFileImports = (file, aliases, additionalImports = () => []) => {
   const sortedAliases = {
-    keys: Object.keys(aliases).sort((a, b) => a.length < b.length),
+    keys: Object.keys(aliases).sort((a, b) => a.length < b.length).filter(x => x !== '/'),
     values: aliases
   };
 
   const origin = (0, _path.dirname)(file.file);
 
-  return getImports(file.content).map(statement => {
+  return getImports(file.content, additionalImports).map(statement => {
     const name = resolver(sortedAliases, origin, trimImport(statement.importName));
     return _extends({}, statement, {
       resolvedName: name,
@@ -86,17 +88,19 @@ const resolveFileImports = exports.resolveFileImports = (file, aliases) => {
   }).filter(({ resolvedName }) => !!resolvedName);
 };
 
-const resolveImports = exports.resolveImports = (files, aliases) => {
+const resolveImports = exports.resolveImports = (files, aliases, additionalImports = () => []) => {
   return renameImports(files.map(file => _extends({}, file, {
-    imports: resolveFileImports(file, aliases)
+    imports: resolveFileImports(file, aliases, additionalImports)
   })));
 };
 
 const renameImports = exports.renameImports = files => {
   const renames = {};
   files.forEach(file => {
-    renames[file.file] = file.rename;
-    renames[stripExt(file.file)] = stripExt(file.rename);
+    if (file.rename) {
+      renames[file.file] = file.rename;
+      renames[stripExt(file.file)] = stripExt(file.rename);
+    }
   });
 
   return files.map(file => _extends({}, file, {
@@ -130,7 +134,7 @@ const fileNestedToRelative = exports.fileNestedToRelative = file => {
 };
 
 const fileApplyAliases = exports.fileApplyAliases = (file, aliases, preferShorter) => {
-  const swappedAliases = Object.keys(aliases).reduce((acc, x) => _extends({}, acc, { [aliases[x]]: x }), {});
+  const swappedAliases = Object.keys(aliases).filter(x => x !== '/').reduce((acc, x) => _extends({}, acc, { [aliases[x]]: x }), {});
   const sortedAliases = {
     values: Object.keys(swappedAliases).sort((a, b) => a.length < b.length),
     keys: swappedAliases

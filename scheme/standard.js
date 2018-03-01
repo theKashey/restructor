@@ -23,27 +23,32 @@ var _imports = require('../imports');
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 exports.default = (() => {
-  var _ref = _asyncToGenerator(function* (root, aliases = {}) {
+  var _ref = _asyncToGenerator(function* (root, initialAliases = {}) {
     const structure = yield (0, _index.restructure)(root);
+    const aliases = _extends({
+      '/': root
+    }, initialAliases);
 
     const renamed = (0, _index.rename)(structure, function (file) {
       let fileName = file.file;
-      if ((0, _types.isJS)(file)) {
-        if ((0, _React.isReact)(file)) {
-          if ((0, _exports.isClassDefaultExported)(file)) {
-            fileName = (0, _exports.nameAsExport)(file);
+      if (!(0, _types.isTest)(file)) {
+        if ((0, _types.isJS)(file)) {
+          if ((0, _React.isReact)(file)) {
+            if ((0, _exports.isClassDefaultExported)(file)) {
+              fileName = (0, _exports.nameAsExport)(file);
+            }
+            fileName = (0, _React.toJSX)(fileName);
           }
-          fileName = (0, _React.toJSX)(fileName);
-        }
 
-        fileName = (0, _letterCase.toCamelCase)(fileName);
-        if ((0, _exports.isClassDefaultExported)(file) || (0, _React.isHOC)(file)) {
-          fileName = (0, _letterCase.startsFromCapital)(fileName);
-        } else {
-          fileName = (0, _letterCase.startsFromLower)(fileName);
+          fileName = (0, _letterCase.toCamelCase)(fileName);
+          if ((0, _exports.isClassDefaultExported)(file) || (0, _React.isHOC)(file)) {
+            fileName = (0, _letterCase.startsFromCapital)(fileName);
+          } else {
+            fileName = (0, _letterCase.startsFromLower)(fileName);
+          }
+          fileName = (0, _letterCase.keepIndex)(fileName);
+          return fileName;
         }
-        fileName = (0, _letterCase.keepIndex)(fileName);
-        return fileName;
       }
       return null;
     });
@@ -52,7 +57,9 @@ exports.default = (() => {
       '/': root
     }, aliases));
 
-    const result = (0, _imports.rewireImports)((0, _imports.applyAliases)((0, _imports.toRelative)((0, _imports.renameImports)(imported)), aliases, true));
+    const result = (0, _imports.rewireImports)((0, _imports.applyAliases)((0, _imports.toRelative)((0, _imports.renameImports)(imported)), aliases, true)).filter(function ({ file, newName, newContent, context }) {
+      return newName && file !== newName || newContent && newContent !== context;
+    });
 
     console.log(result);
     //writeContent(result);
