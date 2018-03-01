@@ -179,7 +179,6 @@ const applyRewireImports = ({content, imports}) => {
   imports
     .filter(({newName, originalName}) => newName && newName !== originalName)
     .forEach(line => {
-      console.log(line);
       const newImport = line.importName.replace(line.originalName, line.newName);
       const newStatement = line.statement.replace(line.importName, newImport);
       newContent = newContent.replace(line.statement, newStatement);

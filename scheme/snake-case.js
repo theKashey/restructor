@@ -34,18 +34,10 @@ exports.default = (() => {
       if (!(0, _types.isTest)(file)) {
         if ((0, _types.isJS)(file)) {
           if ((0, _React.isReact)(file)) {
-            if ((0, _exports.isClassDefaultExported)(file)) {
-              fileName = (0, _exports.nameAsExport)(file);
-            }
             fileName = (0, _React.toJSX)(fileName);
           }
 
-          fileName = (0, _letterCase.toCamelCase)(fileName);
-          if ((0, _exports.isClassDefaultExported)(file) || (0, _React.isHOC)(file)) {
-            fileName = (0, _letterCase.startsFromCapital)(fileName);
-          } else {
-            fileName = (0, _letterCase.startsFromLower)(fileName);
-          }
+          fileName = (0, _letterCase.toSnakeCase)(fileName);
           fileName = (0, _letterCase.keepIndex)(fileName);
           return fileName;
         }

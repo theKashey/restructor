@@ -35,6 +35,7 @@ export async function writeContent(files) {
   await files
     .map(file => {
       if (file.newContent && file.newContent !== file.content) {
+        console.log('updating', file.file);
         return filePutContent(file.file, file.newContent);
       }
       return Promise.resolve();

@@ -45,12 +45,10 @@ export default async function structure(root, initialAliases = {}) {
   });
 
   const result = rewireImports(applyAliases(toRelative(renameImports(imported)), aliases, true))
-    .filter(({file, newName, newContent, context}) => (
-      (newName && file !== newName) || (newContent && newContent !== context)
+    .filter(({file, rename, newContent, context}) => (
+      (rename && file !== rename) || (newContent && newContent !== context)
     ));
 
-  console.log(result);
-  //writeContent(result);
-  //gitRenameAsync(result);
+  return result;
 }
 

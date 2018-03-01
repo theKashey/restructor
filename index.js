@@ -38,6 +38,7 @@ let writeContent = exports.writeContent = (() => {
   var _ref3 = _asyncToGenerator(function* (files) {
     yield files.map(function (file) {
       if (file.newContent && file.newContent !== file.content) {
+        console.log('updating', file.file);
         return (0, _utils.filePutContent)(file.file, file.newContent);
       }
       return Promise.resolve();

@@ -164,7 +164,6 @@ const applyAliases = exports.applyAliases = (files, aliases, preferShorter) => f
 const applyRewireImports = ({ content, imports }) => {
   let newContent = content;
   imports.filter(({ newName, originalName }) => newName && newName !== originalName).forEach(line => {
-    console.log(line);
     const newImport = line.importName.replace(line.originalName, line.newName);
     const newStatement = line.statement.replace(line.importName, newImport);
     newContent = newContent.replace(line.statement, newStatement);

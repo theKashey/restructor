@@ -10,6 +10,8 @@ const pExec = promisify(exec);
 
 async function ensurePathExists(path, lookup) {
   const parts = path.split(sep);
+  parts.pop();
+
   const commands = [];
   let currentPath = '';
 
@@ -26,9 +28,13 @@ async function ensurePathExists(path, lookup) {
 }
 
 export async function gitRenameAsync(names) {
+  const renames = names.filter(({file, rename}) => !!rename && rename!==file);
   const lookup = {};
-  await Promise.all(names.map(({rename}) => ensurePathExists(rename, lookup)));
-  await names
-    .map(({file, rename}) => `git mv ${file} ${rename}`)
-    .map(pExec)
+  await Promise.all(renames.map(({rename}) => ensurePathExists(rename, lookup)));
+  const cmds = renames.map(({file, rename}) => `git mv ${file} ${rename}`);
+
+  for (let cmd of cmds) {
+    console.log(cmd);
+    await pExec(cmd);
+  }
 }

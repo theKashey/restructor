@@ -8,6 +8,8 @@ exports.gitRenameAsync = undefined;
 let ensurePathExists = (() => {
   var _ref = _asyncToGenerator(function* (path, lookup) {
     const parts = path.split(_path.sep);
+    parts.pop();
+
     const commands = [];
     let currentPath = '';
 
@@ -30,13 +32,21 @@ let ensurePathExists = (() => {
 
 let gitRenameAsync = exports.gitRenameAsync = (() => {
   var _ref2 = _asyncToGenerator(function* (names) {
+    const renames = names.filter(function ({ file, rename }) {
+      return !!rename && rename !== file;
+    });
     const lookup = {};
-    yield Promise.all(names.map(function ({ rename }) {
+    yield Promise.all(renames.map(function ({ rename }) {
       return ensurePathExists(rename, lookup);
     }));
-    yield names.map(function ({ file, rename }) {
+    const cmds = renames.map(function ({ file, rename }) {
       return `git mv ${file} ${rename}`;
-    }).map(pExec);
+    });
+
+    for (let cmd of cmds) {
+      console.log(cmd);
+      yield pExec(cmd);
+    }
   });
 
   return function gitRenameAsync(_x3) {
