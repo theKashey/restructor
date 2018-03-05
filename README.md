@@ -19,10 +19,10 @@ It will help you __RESTRUCTURE__ your codebase, rewiring all imports, requires, 
 
 # Schemes
 There are 4 pre-created schemes
- - `import toReactCamelCase from 'restructor/scheme/React-Camel-case' - to restructure to React+CamelCase
- - `import toSnakeCase from 'restructor/scheme/snake-case' - to restructure to snake case
- - `import rewireAlises from 'restructor/scheme/change-aliases' - to change aliases
- - `import rename from 'restructor/scheme/rename' - just to rename anything
+ - `import toReactCamelCase from 'restructor/scheme/React-Camel-case` - to restructure to React+CamelCase
+ - `import toSnakeCase from 'restructor/scheme/snake-case` - to restructure to snake case
+ - `import rewireAlises from 'restructor/scheme/change-aliases` - to change aliases
+ - `import rename from 'restructor/scheme/rename` - just to rename anything
 
 All accepts __root__ as the first argument, and aliases as the second.
 ```js
@@ -32,14 +32,14 @@ const aliases =  {
 };
 
 await toReactCamelCase(root, aliases)
-await toSnakeCase(root, aliases)
+await toKebabCase(root, aliases)
 await rewireAlises(root, oldAliases, newAliases)
 await rename(root, renameCallback, aliases)
 ```
 
-All will return the set of changes, you have to apply
+All will return the set of changes, you __have to apply__. For example
 ```js
-const changes = await toSnakeCase(root, aliases);
+const changes = await toKebabCase(root, aliases);
 await writeContent(change);
 await gitRenameAsync(change);
 ```
@@ -80,8 +80,6 @@ import {applyAliases, toRelative, renameImports, resolveImports, rewireImports} 
 
 `toRelative(structure)` - converts all paths to relative
 `applyAliases(structure, aliases)` - applies aliases where possible.
-
-
 
  
 # Example

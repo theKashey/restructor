@@ -2,7 +2,7 @@ import {restructure, rename, writeContent} from '../index';
 import {gitRenameAsync} from '../versionControl';
 import {isJS, isTest} from '../types';
 import {isReact, toJSX, isHOC} from "../React";
-import {startsFromLower, startsFromCapital, toSnakeCase, toCamelCase, keepIndex} from "../letterCase";
+import {startsFromLower, startsFromCapital, toKebabCase, toCamelCase, keepIndex} from "../letterCase";
 import {isClassDefaultExported, nameAsExport} from "../exports";
 import {applyAliases, toRelative, renameImports, resolveImports, rewireImports} from '../imports'
 
@@ -22,7 +22,7 @@ export default async function structure(root, initialAliases = {}) {
             fileName = toJSX(fileName);
           }
 
-          fileName = toSnakeCase(fileName);
+          fileName = toKebabCase(fileName);
           fileName = keepIndex(fileName)
           return fileName;
         }

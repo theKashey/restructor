@@ -24,7 +24,7 @@ const tokenConversion = name => {
 const makeFromCapital = exports.startsFromCapital = str => str.charAt(0).toUpperCase() + str.substr(1);
 const makeFromLower = exports.startsFromLower = str => str.charAt(0).toLowerCase() + str.substr(1);
 
-const snakeConversion = name => {
+const toKebabCase = name => {
   return tokenConversion(name)
     .join('-')
     .split('-.')
