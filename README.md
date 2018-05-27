@@ -1,6 +1,8 @@
 RE-STRUCTOR
 =====
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/theKashey/restructor.svg)](https://greenkeeper.io/)
+
 It could:
  - make all file names camelCase
  - make all file names snake-case 
